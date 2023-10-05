@@ -1,3 +1,5 @@
+import random
+
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torchvision import datasets, transforms
@@ -17,28 +19,35 @@ val_test_transform = transforms.Compose([
 ])
 
 
-def get_dataloaders_and_classes(batch_size=32):
-    # Loading train dataset
+def get_dataloaders_and_classes(batch_size=32, num_samples_per_class=500):
     train_dataset = datasets.ImageFolder(root='data/train', transform=train_transform)
 
-    # Split dataset into train and test
-    train_idx, test_idx = train_test_split(list(range(len(train_dataset))), test_size=0.2,
-                                           stratify=train_dataset.targets, random_state=42)
+    # Gathering indices per class
+    indices_per_class = {}
+    for idx, (_, class_idx) in enumerate(train_dataset):
+        if class_idx not in indices_per_class:
+            indices_per_class[class_idx] = []
+        indices_per_class[class_idx].append(idx)
 
-    # Creating PyTorch data samplers
+    # Limiting number of samples per class
+    limited_indices = []
+    for class_idx, indices in indices_per_class.items():
+        limited_indices.extend(random.sample(indices, min(num_samples_per_class, len(indices))))
+
+    # Split the limited indices into train and test indices
+    train_idx, val_idx = train_test_split(limited_indices, test_size=0.2,
+                                          stratify=[train_dataset[i][1] for i in limited_indices], random_state=42)
+
+    # Creating data loaders
     train_sampler = SubsetRandomSampler(train_idx)
-    test_sampler = SubsetRandomSampler(test_idx)
+    val_sampler = SubsetRandomSampler(val_idx)
 
-    # Creating DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
-    test_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=test_sampler)
+    val_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=val_sampler)
 
-    # Loading validation dataset
-    val_set = datasets.ImageFolder(root='data/valid', transform=val_test_transform)
-    val_loader = DataLoader(val_set, batch_size=batch_size)
+    test_set = datasets.ImageFolder(root='data/valid', transform=val_test_transform)
+    test_loader = DataLoader(test_set, batch_size=batch_size)
 
     num_classes = len(train_dataset.classes)
 
     return train_loader, val_loader, test_loader, num_classes
-
-

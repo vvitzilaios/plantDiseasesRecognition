@@ -4,13 +4,8 @@ import pandas as pd
 
 def print_diseases():
     plant_diseases = os.listdir("data/train")
-    plants = []
-    diseases = []
-    for plant in plant_diseases:
-        if plant.split('___')[0] not in plants:
-            plants.append(plant.split('___')[0])
-        if plant.split('___')[1] != 'healthy' and plant.split('___')[1] not in diseases:
-            diseases.append(plant.split('___')[1])
+    plants = {plant.split('___')[0] for plant in plant_diseases}
+    diseases = {plant.split('___')[1] for plant in plant_diseases if plant.split('___')[1] != 'healthy'}
 
     print("Unique plants: \n{}\nTotal number: {}".format(plants, len(plants)))
     print("Unique diseases: \n{}\nTotal number: {}".format(diseases, len(diseases)))
