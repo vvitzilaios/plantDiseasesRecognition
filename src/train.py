@@ -101,7 +101,7 @@ def train_model(model_class, num_epochs, num_samples_per_class, batch_size, lear
             print(f"Epoch {epoch + 1}: Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
 
             plot_metrics(model_class, precision, recall, f1, epoch + 1)
-            plot_confusion_matrix(model_class, confusion_matrix, val_loader.dataset.classes)
+            plot_confusion_matrix(model_class, confusion_matrix, val_loader.dataset.classes, epoch + 1)
 
     __save_model(model, model_class)
 

@@ -38,7 +38,7 @@ def plot_loss_and_accuracy(model_name, train_loss, val_loss, train_accuracy, val
     plt.show()
 
 
-def plot_confusion_matrix(model_class, confusion_matrix, classes):
+def plot_confusion_matrix(model_class, confusion_matrix, classes, epoch):
     plt.figure(figsize=(15, 15))
     plt.imshow(confusion_matrix, interpolation='nearest', cmap=plt.cm.Blues)
     plt.title('Confusion Matrix')
@@ -50,7 +50,7 @@ def plot_confusion_matrix(model_class, confusion_matrix, classes):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    save_plot(plt, model_class, 'confusion_matrix')
+    save_plot(plt, model_class, f'confusion_matrix_epoch_{epoch}')
     plt.show()
 
 
@@ -66,7 +66,6 @@ def plot_metrics(model_class, precision, recall, f1_scr, epoch):
         plt.ylim(0, 1)
 
     plt.tight_layout()
-    plt.savefig(f'metrics_epoch_{epoch}.png')
     save_plot(plt, model_class, f'metrics_epoch_{epoch}.png')
     plt.show()
 
